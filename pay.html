@@ -36,7 +36,7 @@
       margin-bottom: 4px;
     }
 
-    /* ── App buttons (non-Safari) ── */
+    /* ── App buttons ── */
     .app-btn {
       display: flex;
       align-items: center;
@@ -70,7 +70,7 @@
       object-fit: contain;
     }
 
-    /* ── Safari fallback ── */
+    /* ── Safari card ── */
     .safari-card {
       background: #fff;
       border-radius: 16px;
@@ -86,14 +86,6 @@
     .safari-note {
       font-size: 0.85rem;
       color: #888;
-      line-height: 1.5;
-    }
-
-    .qr-img {
-      width: 180px;
-      height: 180px;
-      border-radius: 10px;
-      border: 1px solid #e0e0e0;
     }
 
     .upi-id-label {
@@ -102,6 +94,7 @@
       color: #aaa;
       letter-spacing: .08em;
       text-transform: uppercase;
+      margin-bottom: 6px;
     }
 
     .upi-id-copy {
@@ -116,7 +109,7 @@
       font-weight: 700;
       color: #1c1c2e;
       cursor: pointer;
-      transition: border-color .15s, background .15s;
+      transition: border-color .15s, background .15s, transform .1s;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
     }
@@ -124,21 +117,16 @@
     .upi-id-copy:hover { border-color: #1a73e8; background: #f0f6ff; }
     .upi-id-copy:active { transform: scale(.97); }
 
-    .copy-icon {
-      font-size: 1rem;
-      flex-shrink: 0;
-    }
-
     .copy-toast {
       font-size: 0.78rem;
       color: #34a853;
       font-weight: 600;
       min-height: 1em;
-      transition: opacity .3s;
+      margin-top: 8px;
     }
 
     /* ── Error ── */
-    .invalid-screen {
+    .error-screen {
       text-align: center;
       color: #e53935;
       font-size: 1rem;
@@ -149,93 +137,86 @@
 <body>
 
   <div class="container" id="mainContent" style="display:none">
-    <div class="amount-label" id="amtDisplay">₹0.00</div>
+    <div class="amount-label" id="amtDisplay" style="display:none"></div>
 
     <!-- Non-Safari: app buttons -->
-    <div id="appButtons">
-      <div style="display:flex;flex-direction:column;gap:12px;">
-        <a class="app-btn" id="aGpay" href="#">
-          <img class="app-icon" src="static/gpay.svg" alt="Google Pay">
-          Google Pay
-        </a>
-        <a class="app-btn" id="aPhonepe" href="#">
-          <img class="app-icon" src="static/phonepe.svg" alt="PhonePe">
-          PhonePe
-        </a>
-        <a class="app-btn" id="aPaytm" href="#">
-          <img class="app-icon" src="static/paytm.svg" alt="Paytm">
-          Paytm
-        </a>
-        <a class="app-btn" id="aBhim" href="#">
-          <img class="app-icon" src="static/bhim.svg" alt="BHIM">
-          BHIM
-        </a>
-      </div>
+    <div id="appButtons" style="display:flex;flex-direction:column;gap:12px;">
+      <a class="app-btn" id="aGpay" href="#">
+        <img class="app-icon" src="static/gpay.svg" alt="Google Pay">
+        Google Pay
+      </a>
+      <a class="app-btn" id="aPhonepe" href="#">
+        <img class="app-icon" src="static/phonepe.svg" alt="PhonePe">
+        PhonePe
+      </a>
+      <a class="app-btn" id="aPaytm" href="#">
+        <img class="app-icon" src="static/paytm.svg" alt="Paytm">
+        Paytm
+      </a>
+      <a class="app-btn" id="aBhim" href="#">
+        <img class="app-icon" src="static/bhim.svg" alt="BHIM">
+        BHIM
+      </a>
     </div>
 
-    <!-- Safari: QR + UPI ID -->
-    <div id="safariCard" class="safari-card">
-      <p class="safari-note">Safari doesn't support UPI deep links.<br>Scan the QR code or copy the UPI ID below.</p>
-      <img class="qr-img" id="qrImg" src="" alt="UPI QR Code">
+    <!-- Safari: note + UPI ID -->
+    <div id="safariCard" class="safari-card" style="display:none">
+      <p class="safari-note">Use QR code below.</p>
       <div>
         <div class="upi-id-label">UPI ID</div>
-        <div style="height:6px"></div>
         <div class="upi-id-copy" id="copyBtn">
-          <span id="upiIdText">mab.037348011560040@axisbank</span>
-          <span class="copy-icon">⧉</span>
+          <span>mab.037348011560040@axisbank</span>
+          <span>⧉</span>
         </div>
-        <div style="height:8px"></div>
         <div class="copy-toast" id="copyToast"></div>
       </div>
     </div>
   </div>
 
-  <div class="invalid-screen" id="errScreen" style="display:none">
+  <div class="error-screen" id="errScreen" style="display:none">
     Invalid amount
   </div>
 
   <script>
     (function () {
-      var PA  = 'mab.037348011560040@axisbank';
-      var PN  = 'APOLLO HOSPITALS EDUCATIONAL RESEARCH FOUNDATIONs AVINYA%20Name';
-      var CU  = 'INR';
+      var PA = 'mab.037348011560040@axisbank';
+      var PN = 'Avinya%20Name';
+      var CU = 'INR';
 
       var qs  = new URLSearchParams(window.location.search);
       var raw = parseFloat(qs.get('amount'));
+      var hasAmount = raw && !isNaN(raw) && raw > 0;
+      var amt = hasAmount ? raw.toFixed(2) : null;
 
-      if (!raw || isNaN(raw) || raw <= 0) {
-        document.getElementById('errScreen').style.display = '';
-        return;
-      }
-
-      var amt = raw.toFixed(2);
-      document.getElementById('amtDisplay').textContent = '₹' + amt;
       document.getElementById('mainContent').style.display = '';
 
+      if (amt) {
+        var amtEl = document.getElementById('amtDisplay');
+        amtEl.textContent = '₹' + amt;
+        amtEl.style.display = '';
+      }
+
       function upiLink(scheme) {
-        return scheme + '?pa=' + PA + '&pn=' + PN + '&am=' + amt + '&cu=' + CU;
+        var link = scheme + '?pa=' + PA + '&pn=' + PN + '&cu=' + CU;
+        if (amt) link += '&am=' + amt;
+        return link;
       }
 
       var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
       if (isSafari) {
         document.getElementById('appButtons').style.display = 'none';
-
-        var upiUri = upiLink('upi://pay');
-        document.getElementById('qrImg').src =
-          'https://api.qrserver.com/v1/create-qr-code/?size=200x200&ecc=M&data=' + encodeURIComponent(upiUri);
+        document.getElementById('safariCard').style.display = '';
 
         document.getElementById('copyBtn').addEventListener('click', function () {
-          var text = PA;
           var toast = document.getElementById('copyToast');
-          navigator.clipboard.writeText(text).then(function () {
+          navigator.clipboard.writeText(PA).then(function () {
             toast.textContent = 'Copied!';
             setTimeout(function () { toast.textContent = ''; }, 2000);
           }).catch(function () {
             var tmp = document.createElement('textarea');
-            tmp.value = text;
-            tmp.style.position = 'fixed';
-            tmp.style.opacity = '0';
+            tmp.value = PA;
+            tmp.style.cssText = 'position:fixed;opacity:0';
             document.body.appendChild(tmp);
             tmp.select();
             document.execCommand('copy');
@@ -245,7 +226,6 @@
           });
         });
       } else {
-        document.getElementById('safariCard').style.display = 'none';
         document.getElementById('aGpay').href    = upiLink('tez://upi/pay');
         document.getElementById('aPhonepe').href = upiLink('phonepe://pay');
         document.getElementById('aPaytm').href   = upiLink('paytmmp://pay');
