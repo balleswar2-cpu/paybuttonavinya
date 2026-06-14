@@ -16,19 +16,25 @@ Or use the clean redirect route:
 /pay/250
 ```
 
+The `amount` parameter is optional. If omitted, the amount label is hidden and `&am=` is not included in the UPI deep link.
+
 ## Behaviour
 
-- **Android / other browsers** — shows four app buttons (Google Pay, PhonePe, Paytm, BHIM) that open the respective UPI app directly.
-- **Safari (iOS / macOS)** — UPI deep links are not supported in Safari, so the page shows a scannable QR code and a tap-to-copy UPI ID instead.
+| Browser | What the user sees |
+|---------|-------------------|
+| Android / other | Four app buttons — Google Pay, PhonePe, Paytm, BHIM — that open the respective UPI app directly |
+| Safari (iOS / macOS) | "Use QR code below." note, plus a tap-to-copy UPI ID |
+
+Safari is detected via `navigator.vendor` (Apple) with Chrome-on-iOS (CriOS) and Firefox-on-iOS (FxiOS) exclusions. Source: [stackoverflow.com/a/31732310](https://stackoverflow.com/a/31732310), CC BY-SA 4.0.
 
 ## Files
 
 | File | Purpose |
 |------|---------|
 | `index.html` | Google Pay direct deep link (legacy) |
-| `pay.html` | Main payment page with app detection |
+| `pay.html` | Main payment page with browser detection |
 | `static/` | SVG icons for each UPI app |
-| `server.py` | Simple Python server with `/pay/:amount` redirect |
+| `server.py` | Python static file server with `/pay/:amount` redirect |
 
 ## Run Locally
 
@@ -36,4 +42,4 @@ Or use the clean redirect route:
 python server.py
 ```
 
-Runs on `http://localhost:5000`. The UPI deep links only activate on a mobile device with a UPI app installed.
+Runs on `http://0.0.0.0:5000`.

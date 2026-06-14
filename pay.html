@@ -202,7 +202,13 @@
         return link;
       }
 
-      var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+      // Source - https://stackoverflow.com/a/31732310
+      // Posted by qingu, modified by community. See post 'Timeline' for change history
+      // Retrieved 2026-06-14, License - CC BY-SA 4.0
+      var isSafari = navigator.vendor && navigator.vendor.indexOf('Apple') > -1 &&
+                     navigator.userAgent &&
+                     navigator.userAgent.indexOf('CriOS') == -1 &&
+                     navigator.userAgent.indexOf('FxiOS') == -1;
 
       if (isSafari) {
         document.getElementById('appButtons').style.display = 'none';
