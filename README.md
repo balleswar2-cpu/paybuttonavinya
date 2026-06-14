@@ -1,17 +1,39 @@
 # UPI Payment Page
 
-A single-page static site with one centered button that triggers a UPI payment deep link. Can be embedded for quick access.
+A static payment page that generates UPI deep links for quick mobile payments. Pass an amount via URL and the page handles the rest.
 
-## Technologies
+## Usage
 
-- Plain HTML, CSS, JavaScript (no framework, no build step)
+Link to `pay.html` with an `amount` query parameter:
+
+```
+/pay.html?amount=250
+```
+
+Or use the clean redirect route:
+
+```
+/pay/250
+```
+
+## Behaviour
+
+- **Android / other browsers** — shows four app buttons (Google Pay, PhonePe, Paytm, BHIM) that open the respective UPI app directly.
+- **Safari (iOS / macOS)** — UPI deep links are not supported in Safari, so the page shows a scannable QR code and a tap-to-copy UPI ID instead.
+
+## Files
+
+| File | Purpose |
+|------|---------|
+| `index.html` | Google Pay direct deep link (legacy) |
+| `pay.html` | Main payment page with app detection |
+| `static/` | SVG icons for each UPI app |
+| `server.py` | Simple Python server with `/pay/:amount` redirect |
 
 ## Run Locally
 
-Open `index.html` directly in a browser, or serve it with any static file server:
-
 ```bash
-npx serve .
+python server.py
 ```
 
-The UPI deep link only activates on Android devices with a UPI app installed.
+Runs on `http://localhost:5000`. The UPI deep links only activate on a mobile device with a UPI app installed.
