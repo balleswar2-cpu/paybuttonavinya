@@ -1,6 +1,6 @@
 # UPI Payment Page
 
-A single-page static site with one centered button that triggers a UPI payment deep link.
+A single-page static site with one centered button that triggers a UPI payment deep link. Can be embedded for quick access.
 
 ## Technologies
 
