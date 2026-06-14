@@ -46,8 +46,21 @@
   </style>
 </head>
 <body>
-  <a class="pay-btn" href="gpay://upi/pay?pa=mab.037348011560040@axisbank&pn=Avinya%20Name&am=100.00&cu=INR">
-    Click Here to Use UPI
-  </a>
+  <a class="pay-btn" id="payBtn" href="#">Click Here to Pay</a>
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var amount = parseFloat(params.get('amount'));
+      if (!amount || isNaN(amount) || amount <= 0) {
+        document.getElementById('payBtn').textContent = 'Invalid amount';
+        return;
+      }
+      var formatted = amount.toFixed(2);
+      var upi = 'gpay://upi/pay?pa=mab.037348011560040@axisbank&pn=Avinya%20Name&am=' + formatted + '&cu=INR';
+      var btn = document.getElementById('payBtn');
+      btn.href = upi;
+      btn.textContent = 'Pay ₹' + formatted;
+    })();
+  </script>
 </body>
 </html>
